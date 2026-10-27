@@ -1,13 +1,14 @@
-export const storeConfig = {
-  brand: 'THREADLAB',
+﻿export const storeConfig = {
+  brand: 'H&H BRANDINGS',
+  logoImage: '/images/hh-branding-logo.jpg',
   announcement: 'YOUR IDEA. OUR INK. MADE TO BE WORN.',
   currency: 'INR',
   locale: 'en-IN',
-  whatsappNumber: '', // Add the business number in international format, digits only.
-  instagramUrl: '#', // Replace with the client's Instagram URL.
-  upiQrImage: '', // Optional: path or URL to the supplied UPI QR image.
+  whatsappNumber: '919121881137',
+  instagramUrl: 'https://www.instagram.com/printify_hh?obrf=NHBsNTN6c3R1dGw4',
   email: 'hello@yourbrand.example',
-  city: 'Made in India',
+  city: 'Hyderabad',
+  address: 'Tirumala Nagar, Moula Ali, Hyderabad, Secunderabad, Telangana 500040, India',
 }
 
 export const formatPrice = (amount: number) =>
@@ -21,3 +22,5 @@ export const whatsappUrl = (message: string) =>
   storeConfig.whatsappNumber
     ? `https://wa.me/${storeConfig.whatsappNumber}?text=${encodeURIComponent(message)}`
     : ''
+
+

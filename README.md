@@ -1,70 +1,74 @@
-# Culture Lab — premium streetwear ecommerce demo
+﻿# H&H Brandings Hyderabad storefront demo
 
-A responsive React/Vite storefront and admin workspace for an original, fictional streetwear label. The current app is a **browser-saved demo**: the product catalogue, bag, wishlist, homepage headline, announcement, and simulated orders persist in the current browser with `localStorage`. It is not a production commerce backend.
+A responsive React, Vite and TypeScript storefront for the H&H Brandings Hyderabad custom T-shirt business. The project includes a guest checkout integration with Razorpay and Supabase Edge Functions; real payments require the store's own credentials and deployed Supabase project.
 
 ## Run locally
 
-Requirements: Node.js 20+ and npm.
+Requirements: Node.js 20+ and npm. Dependencies are already present in this workspace.
 
-```sh
-npm install
-npm run dev
+```powershell
+npm.cmd run dev
 ```
 
 Build and preview:
 
-```sh
-npm run build
-npm run preview
+```powershell
+npm.cmd run build
+npm.cmd run preview
 ```
 
-## Included demo flows
+For browser checks, start the dev server on port 4173 in one terminal:
 
-- Responsive home, catalogue, collection, product, wishlist, cart, checkout, order confirmation, account placeholder, and admin routes.
-- 16 sample products, catalogue search, category filtering, sort, product sizes, stock-aware add-to-bag, wishlist, quick add, and local cart persistence.
-- Demo coupon codes `WELCOME10` and `CULTURE15`.
-- Address form validation and simulated success, failure, and cancellation states. The interface says when a transaction is simulated; it never represents it as a verified payment.
-- Admin overview, local product creation, stock editing, homepage headline and announcement editing, and simulated order list.
-- Layout adjustments for phone, tablet, and desktop; reduced-motion support and keyboard focus indicators.
+```powershell
+npm.cmd run dev -- --host 127.0.0.1 --port 4173
+```
 
-## Supabase foundation
+Then run the checks in a second terminal:
 
-The initial schema and RLS policies are in `supabase/migrations/202610260001_core_store.sql`. The schema covers profiles, roles, catalogue and variants, media, collections, homepage sections, campaigns, settings, addresses, wishlists, coupons, orders and immutable item snapshots, payments, order history, reviews, newsletter subscriptions, publication snapshots, and admin audit logs. Public storefront reads and admin writes are separated with RLS. New signups receive the `customer` role only.
+```powershell
+npm.cmd run test:e2e
+```
 
-This migration is a starting point, not a complete production security review. Apply it to a disposable Supabase project first and review policies, storage access, indexes, lifecycle triggers, and data-retention requirements before production use. Never promote a user to admin from the browser. Grant admin through a trusted operator process after verifying the user's auth ID.
+## Demo features
 
-1. Install the [Supabase CLI](https://supabase.com/docs/guides/cli) and create a project.
-2. Copy `.env.example` to `.env.local`; set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` for client configuration.
-3. Link and apply migrations: `supabase link --project-ref YOUR_PROJECT_REF` then `supabase db push`.
-4. Configure auth redirect URLs and email delivery in the Supabase project.
-5. Configure private service secrets only in server-side Edge Function secrets. Never add `SUPABASE_SERVICE_ROLE_KEY` or `RAZORPAY_KEY_SECRET` to a `VITE_` variable.
-6. The migration creates a public `storefront-media` bucket with a 50 MB per-file limit and image/video MIME allowlist. Review that limit and separate private files before launch.
+- A 2-second animated H&H eagle logo intro, branded header/footer, responsive collections, catalogue, custom enquiry and checkout sections.
+- The supplied H&H Brandings logo is used in the intro, header and footer from `public/images/hh-branding-logo.jpg`.
+- Eight sample products with INR pricing, search, category filtering, price sorting, colour and size selection, and quick product details.
+- Variant-aware bag with quantity controls, remove actions and `localStorage` persistence. Customers sign in before checkout and can open a dedicated shipment tracking view from their account dashboard or the Track order navigation item.
+- Prepared order and custom enquiry messages with WhatsApp URL encoding. Messages are only opened for review; customers send them themselves.
+- Razorpay checkout integration that creates orders and verifies captured payments on Supabase Edge Functions. Payment secrets stay server-side.
+- Eight supplied product and campaign images in `public/images/client/`, used locally across the hero, collections and catalogue.
+- Reduced-motion styles and layouts checked at 375, 430, 768, 1366 and 1920 pixels.
 
-## Payment setup and limitations
+## Enable online checkout
 
-Razorpay credentials are not supplied. The current checkout therefore runs only the clearly labelled simulator: simulated success records a local demo order; simulated failure and cancellation leave the bag intact. It does not call Razorpay, create a server order, verify a signature, reserve inventory, or persist payment records remotely. No real order or payment is placed.
+1. Create and configure the Supabase project, then apply the database migrations with `supabase db push`. This enables customer order history and carrier tracking fields.
+2. Copy `.env.example` to `.env.local` and set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` from the Supabase project settings. For address search and map-based address lookup, optionally set `VITE_GOOGLE_MAPS_API_KEY`; enable Places API (New) and Geocoding API and restrict the browser key to your storefront domains. Customers can always type their address manually without this key.
+3. Copy `supabase/functions/.env.example` to `supabase/functions/.env` for local Edge Function development. Set Razorpay test credentials, the local Supabase URL, anon key and service role key there. Never put Razorpay secrets or the service role key in a `VITE_` variable.
+4. Set production Edge Function secrets in Supabase for `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET` and `STORE_ALLOWED_ORIGINS` (comma-separated exact storefront origins). Supabase supplies its server-side service role key to hosted functions.
+5. Deploy `create-payment-order`, `verify-payment`, `razorpay-webhook` and `update-order-tracking`. Configure the Razorpay webhook URL as `https://<project-ref>.supabase.co/functions/v1/razorpay-webhook` and subscribe to `payment.captured` and `payment.failed`.
+6. Test with Razorpay test-mode keys and a successful test payment before switching the account to live keys. The storefront will show a setup message until the public Supabase URL/key are set.
 
-To launch real payments, implement and deploy authenticated/server-side Edge Functions that recalculate the catalogue price and stock, reserve inventory transactionally, validate coupons and shipping, create an idempotent pending order, create the Razorpay order, verify the Razorpay signature using a server secret, and safely process duplicate callbacks. Store only provider references and payment state. Configure credentials as Edge Function secrets, then integrate the verified flow in the client. Do not enable a live payment button until this workflow has been implemented and reviewed.
+Customers create an account or sign in before checkout. Supabase Auth owns the session, and row-level security limits customer views to their orders. To grant staff access, set that user’s `public.user_roles.role` to `admin` from the trusted Supabase SQL editor (never from the browser): `insert into public.user_roles (user_id, role) values ('<auth-user-uuid>', 'admin') on conflict (user_id) do update set role = 'admin';`. Admins can then update status, expected arrival, carrier, tracking number, HTTPS tracking URL, latest scan location and update note from the shipment tracking view. Each save adds a customer-visible `order_status_history` event. The location illustration is schematic; live carrier or GPS data is not connected. The checkout function recalculates amounts from its server-side catalogue. Keep that catalogue in `supabase/functions/create-payment-order/index.ts` aligned with `src/products.ts` whenever products, variants or prices change. Delivery charges are not added by the current checkout; the store must confirm them separately if applicable.
 
-## Known limitations
+## Client configuration
 
-- Supabase schema/RLS are supplied but the UI is not yet wired to Supabase Auth, database queries, realtime/publishing, or Storage. Browser data is per-browser and must not be treated as shared or authoritative.
-- Admin pages are not authenticated in this demo. The local product editor and CMS controls are for presentation only; RLS is not a substitute for implementing server-backed admin sign-in and authorization.
-- Media-library upload, video management, drag-and-drop homepage sections, scheduled campaign publishing, and version rollback are not implemented.
-- Search and catalogue filters operate on the seeded browser catalogue. Account pages and policy pages are content placeholders; tracking, customer records, reviews, and real newsletters are not connected.
-- Coupon validation is a demo-only code check, not a server-side eligibility/usage check. Prices, stock, shipping, and discounts must be recalculated by a trusted backend before accepting an order.
-- Product images are remote Unsplash image URLs used for visual demo content; replace with client-owned/licensed assets and managed storage before production.
-- No real company address, contact channel, shipping promise, policy text, or credentials were supplied. Placeholder contact information and delivery copy must be reviewed before publishing.
-- End-to-end browser checks cover core shopping, coupon, checkout-failure and success, mobile navigation, and local admin edit flows. They do not cover the full master-prompt acceptance list, external integrations, security, or a comprehensive device/browser matrix.
+Update `src/storeConfig.ts` with the approved brand name, announcement, WhatsApp business number (international digits only), Instagram URL, business email and location. The WhatsApp number is intentionally blank; WhatsApp actions show a setup message and reveal the prepared cart message until that number is supplied.
 
-## Handover checklist
+Edit `src/products.ts` to replace demo products, descriptions, colours, sizes, prices and artwork. Theme colours are CSS variables near the top of `src/style.css`. Replace the original vector campaign art in `public/images/` with client-approved photographs after they are supplied.
 
-- [x] Install dependencies and run `npm run build`.
-- [x] Run core browser smoke checks with Chrome: `npm run dev -- --host 127.0.0.1 --port 4173` in one terminal, then `npm run test:e2e` in another.
-- [ ] Run the app and verify shopping interactions at phone, tablet, laptop, and wide-desktop sizes.
-- [ ] Configure Supabase Auth and connect the customer and admin UI to authenticated APIs.
-- [ ] Add storage upload validation and image/video metadata, usage references, replace/delete safeguards, and publishing history.
-- [ ] Add transactional server-side order and inventory operations plus verified Razorpay test-mode checkout.
-- [ ] Test RLS from anon, customer, and admin accounts; verify customers cannot read another customer's orders.
-- [ ] Replace sample imagery and all placeholder business/policy content.
-- [ ] Complete the master prompt's end-to-end checklist before production claims or launch.
+## Limitations before production
+
+- Product browsing and cart contents live in the browser. Customer accounts, checkout orders, payment verification and order tracking use Supabase after configuration. Inventory reservation, automatic fulfillment updates, email receipts and refunds are not automated.
+- WhatsApp requires the real business number before its links can open. Business contact details and policy copy are placeholders pending client approval.
+- Product content and the local vector artwork are demonstration material and should be reviewed and replaced with the client's approved catalogue and brand assets before launch.
+- Supabase function credentials, Razorpay account setup, webhook deployment and live payment approval must be completed before accepting real payments.
+
+
+
+
+
+
+
+
+

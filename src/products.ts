@@ -1,10 +1,11 @@
-export type Product = {
+﻿export type Product = {
   id: string
   name: string
   category: string
   price: number
   originalPrice?: number
   image: string
+  fallbackImage: string
   alt: string
   badge?: string
   colours: { name: string; hex: string }[]
@@ -13,21 +14,27 @@ export type Product = {
   print: string
 }
 
-const teePhoto = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1000&q=85'
-const modelPhoto = 'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=1000&q=85'
-const campaignPhoto = 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=85'
-const studioPhoto = 'https://images.unsplash.com/photo-1523398002811-999ca8dec234?auto=format&fit=crop&w=1000&q=85'
-const editorialPhoto = 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=1000&q=85'
+const image = (file: string) => `/images/client/${file}`
+const blackFrontBack = image('rebel-star-front-back.jpeg')
+const creamFrontBack = image('cream-oversized-front-back.jpeg')
+const womensRebel = image('rebel-star-womens-tee.jpeg')
+const footPrint = image('black-shirt-foot-print.jpeg')
+const facePocket = image('black-shirt-face-pocket.jpeg')
+const sadarPoster1 = image('sadar-dtf-poster-1.jpeg')
+const sadarPoster2 = image('sadar-dtf-poster-2.jpeg')
+const spiritShirt = image('spirit-shirt-back.jpeg')
+
+const product = (details: Omit<Product, 'fallbackImage'>): Product => ({ ...details, fallbackImage: details.image })
 
 export const products: Product[] = [
-  { id: '01', name: 'Good Things Take Time', category: 'Graphic Tees', price: 899, originalPrice: 1199, image: teePhoto, alt: 'White cotton graphic t-shirt', badge: 'BESTSELLER', colours: [{ name: 'Chalk', hex: '#f2eee6' }, { name: 'Ink', hex: '#252525' }, { name: 'Sage', hex: '#8b9988' }], sizes: ['S', 'M', 'L', 'XL', 'XXL'], description: 'A little reminder for the everyday. Printed on a soft, heavyweight tee with an easy unisex fit.', print: 'Water-based screen print' },
-  { id: '02', name: 'Offline Club', category: 'Oversized Tees', price: 1099, image: modelPhoto, alt: 'Relaxed oversized streetwear t-shirt', badge: 'NEW DROP', colours: [{ name: 'Washed black', hex: '#353535' }, { name: 'Bone', hex: '#ded8cc' }], sizes: ['S', 'M', 'L', 'XL', 'XXL'], description: 'For the plans that can wait. An oversized silhouette with a relaxed shoulder and a soft, lived-in feel.', print: 'Soft-hand DTG print' },
-  { id: '03', name: 'Make Your Own', category: 'Custom Prints', price: 999, image: campaignPhoto, alt: 'Blank t-shirt ready for a custom print', colours: [{ name: 'White', hex: '#f8f7f3' }, { name: 'Black', hex: '#252525' }, { name: 'Natural', hex: '#cabea8' }], sizes: ['S', 'M', 'L', 'XL', 'XXL'], description: 'Your artwork, your words, your way. Start with our premium blank and tell us what you have in mind.', print: 'Choose screen print or DTG' },
-  { id: '04', name: 'Small Town Energy', category: 'Graphic Tees', price: 899, image: editorialPhoto, alt: 'Lifestyle photo for a graphic tee', colours: [{ name: 'Cream', hex: '#e9e3d7' }, { name: 'Moss', hex: '#687462' }], sizes: ['S', 'M', 'L', 'XL', 'XXL'], description: 'A hometown state of mind, wherever you end up. Easy fit, soft cotton and a graphic that feels like yours.', print: 'Water-based screen print' },
-  { id: '05', name: 'Good Mood Department', category: 'Best Sellers', price: 949, image: studioPhoto, alt: 'Printed t-shirt on a studio model', badge: 'FAN FAVOURITE', colours: [{ name: 'White', hex: '#f8f7f3' }, { name: 'Rose', hex: '#c98479' }], sizes: ['S', 'M', 'L', 'XL', 'XXL'], description: 'An everyday uniform for brighter days, printed in small batches on our soft cotton base.', print: 'Soft-hand DTG print' },
-  { id: '06', name: 'Out of Office', category: 'Oversized Tees', price: 1099, image: teePhoto, alt: 'Oversized relaxed fit white t-shirt', colours: [{ name: 'Chalk', hex: '#f2eee6' }, { name: 'Blue', hex: '#708499' }], sizes: ['S', 'M', 'L', 'XL', 'XXL'], description: 'A relaxed weekend state of mind, in a roomy oversized tee that is ready to go anywhere.', print: 'Water-based screen print' },
-  { id: '07', name: 'The Sunday Special', category: 'Graphic Tees', price: 899, image: editorialPhoto, alt: 'Graphic t-shirt styled for a casual day', colours: [{ name: 'Oat', hex: '#d6c8b1' }, { name: 'Ink', hex: '#252525' }], sizes: ['S', 'M', 'L', 'XL', 'XXL'], description: 'Made for slow mornings and one-more-coffee afternoons. Printed on a breathable cotton tee.', print: 'Water-based screen print' },
-  { id: '08', name: 'Your Team, Your Tee', category: 'Custom Prints', price: 799, originalPrice: 999, image: modelPhoto, alt: 'Group-ready custom t-shirt style', badge: 'BULK READY', colours: [{ name: 'White', hex: '#f8f7f3' }, { name: 'Black', hex: '#252525' }, { name: 'More colours', hex: '#b5a993' }], sizes: ['S', 'M', 'L', 'XL', 'XXL'], description: 'One design, the whole crew. Tell us about your event or team and we will help bring it to life.', print: 'Bulk print options available' },
+  product({ id: '01', name: 'Rebel Star Graphic Tee', category: 'Graphic Tees', price: 899, originalPrice: 1199, image: blackFrontBack, alt: 'Black Rebel Star graphic tee shown front and back', badge: 'BESTSELLER', colours: [{ name: 'Ink', hex: '#252525' }], sizes: ['S', 'M', 'L', 'XL', 'XXL'], description: 'A bold, movie-inspired graphic on a relaxed black tee. Front and back artwork shown.', print: 'Printed graphic' }),
+  product({ id: '02', name: 'Cream Oversized Graphic Tee', category: 'Oversized Tees', price: 1099, image: creamFrontBack, alt: 'Cream oversized graphic tee modeled front and back', badge: 'NEW DROP', colours: [{ name: 'Cream', hex: '#e9e3d7' }], sizes: ['S', 'M', 'L', 'XL', 'XXL'], description: 'A relaxed cream tee with bold red and black artwork, shown from both sides.', print: 'Printed graphic' }),
+  product({ id: '03', name: 'Sadar Theme DTF Shirt', category: 'Custom Prints', price: 999, image: sadarPoster1, alt: 'Sadar theme DTF printed shirt promotional artwork', colours: [{ name: 'White', hex: '#f8f7f3' }], sizes: ['S', 'M', 'L', 'XL', 'XXL'], description: 'A festive Sadar theme shirt design. Contact the studio to confirm sizes and current pricing.', print: 'DTF print' }),
+  product({ id: '04', name: 'Spirit Graphic Tee', category: 'Graphic Tees', price: 899, image: spiritShirt, alt: 'Back of a white shirt with a Spirit themed graphic', colours: [{ name: 'White', hex: '#f8f7f3' }], sizes: ['S', 'M', 'L', 'XL', 'XXL'], description: 'A statement back print on a white tee, with Telugu text and warm metallic artwork.', print: 'Printed graphic' }),
+  product({ id: '05', name: 'Rebel Star Women’s Tee', category: 'Best Sellers', price: 949, image: womensRebel, alt: 'Model wearing a black Rebel Star graphic tee', badge: 'FAN FAVOURITE', colours: [{ name: 'Ink', hex: '#252525' }], sizes: ['S', 'M', 'L', 'XL', 'XXL'], description: 'A black graphic tee styled for an easy everyday fit.', print: 'Printed graphic' }),
+  product({ id: '06', name: 'Decorative Foot Print Shirt', category: 'Oversized Tees', price: 1099, image: footPrint, alt: 'Back of a black shirt with a decorative foot illustration', colours: [{ name: 'Ink', hex: '#252525' }], sizes: ['S', 'M', 'L', 'XL', 'XXL'], description: 'A black shirt featuring a detailed traditional inspired back illustration.', print: 'Printed graphic' }),
+  product({ id: '07', name: 'Face Print Pocket Shirt', category: 'Graphic Tees', price: 899, image: facePocket, alt: 'Black button shirt with a colorful face design on its chest pocket', colours: [{ name: 'Ink', hex: '#252525' }], sizes: ['S', 'M', 'L', 'XL', 'XXL'], description: 'A black button shirt featuring a colorful illustrated chest pocket.', print: 'Printed pocket graphic' }),
+  product({ id: '08', name: 'Sadar Festival Shirt', category: 'Custom Prints', price: 999, image: sadarPoster2, alt: 'Sadar theme printed shirt shown in festival promotional artwork', badge: 'FESTIVE PICK', colours: [{ name: 'White', hex: '#f8f7f3' }], sizes: ['S', 'M', 'L', 'XL', 'XXL'], description: 'A festive printed shirt design. Contact the studio to confirm sizes and current pricing.', print: 'DTF print' }),
 ]
 
 export const categories = ['All tees', 'Graphic Tees', 'Oversized Tees', 'Custom Prints', 'Best Sellers']
